@@ -23,3 +23,13 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+Cypress.Commands.add('getByData', (selector) => {
+    return cy.get(`[data-test=${selector}]`)
+});
+
+Cypress.Commands.add('login', (email, senha) => {
+    cy.getByData('credencialLogin').type(`${email}`)
+    cy.getByData('senhaLogin').type(`${senha}`)
+    cy.getByData('button-cadastrar').click()
+});
