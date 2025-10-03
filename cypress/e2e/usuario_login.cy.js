@@ -39,4 +39,37 @@ describe('Usuário login e listar', () => {
    cy.wait('@loginRequest').its('response.statusCode').should('eq', 401)
   });
 
+  it('Deve listar usuários com sucesso, confirmando paginação e dados comparando com a API, aplicando os filtros da consulta', () => {
+    
+  });
+
+  it('Deve cadastrar um usuários com sucesso, confirmando resposta de rede retornada na operação', () => {
+    cy.login('chefe', 'ABCDabcd1234')
+    cy.getByData('botao-page-usuarios').click()
+    cy.url().should('eq', 'https://frotas.app.fslab.dev/usuarios')
+    cy.contains('h1', 'Usuários').should('be.visible')
+
+    cy.getByData('novoUsuarioButton').click()
+    cy.url().should('eq', 'https://frotas.app.fslab.dev/usuarios/cadastrar')
+    cy.contains('h1', 'Cadastrar usuário').should('be.visible')
+
+    cy.getByData('inputNomeUsuario').type('New user frota')
+    cy.getByData('inputCpfUsuario').type('12345678901')
+    cy.getByData('inputDataNascimentoUsuario').type('12/09/2000')
+    cy.getByData('inputTelefoneUsuario').type('(99) 99999-9999')
+    cy.getByData('inputEmailUsuario').type('newuser@frota.com')
+    cy.getByData('inputEnderecoLogradouroUsuario').type('Avenida Frota')
+    cy.getByData('inputEnderecoNumeroUsuario').type('99')
+    cy.getByData('inputEnderecoBairroUsuario').type('Bairro Frota')
+    cy.getByData('inputEnderecoCepUsuario').type('99999-999')
+
+    cy.getByData('inputCredencialUsuario').type('123Frota')
+    cy.getByData('inputSenhaUsuario').type('123frota')
+    cy.getByData('inputConfirmarSenha').type('123frota')
+  });
+
+
+  it('Deve atualizar um usuários com sucesso, confirmando resposta de rede retornada na operação', () => {
+    // Implementação use o cy.intercetp()
+  });
 })
