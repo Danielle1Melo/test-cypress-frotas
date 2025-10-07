@@ -72,25 +72,37 @@ describe('Usuário login e listar', () => {
       return `frota-${timestamp}${random}@test.com`;
     }
 
+    function generateCredencial(){
+      const timestamp = Date.now().toString(36);
+      const random = Math.random().toString(36).substring(2, 6);
+      return `frota${timestamp}${random}`;
+    }
+
     const uniqueEmail = generateEmailUnique()
     const uniqueCPF = generateCPF()
+    const uniqueCredencial = generateCredencial()
 
     cy.getByData('inputNomeUsuario').type('New user frota')
     cy.getByData('inputCpfUsuario').type(uniqueCPF)
     cy.getByData('inputDataNascimentoUsuario').type('2000-09-12')
     cy.getByData('inputTelefoneUsuario').type('(99) 99999-9999')
     cy.getByData('inputEmailUsuario').type(uniqueEmail)
+    cy.getByData('inputDataAdmissaoUsuario').type('2025-10-01')
     cy.getByData('inputEnderecoLogradouroUsuario').type('Avenida Frota')
     cy.getByData('inputEnderecoNumeroUsuario').type('99')
     cy.getByData('inputEnderecoBairroUsuario').type('Bairro Frota')
     cy.getByData('inputEnderecoCepUsuario').type('99999-999')
 
-    cy.getByData('inputCredencialUsuario').type('123Frota')
+    cy.getByData('inputCredencialUsuario').type(uniqueCredencial)
     cy.getByData('inputSenhaUsuario').type('123@FrotasADS')
     cy.getByData('inputConfirmarSenha').type('123@FrotasADS')
     cy.getByData('button-cadastrar').click()
-  });
 
- 
+    cy.contains('Usuário cadastrado com sucesso').should('be.visible')
+    
+    cy.wait('@cadastrarUsuario').then((interception) => {
+      expect(interception.response.statusCode).should('eq', 200)
+    })
+  });
 })
 
