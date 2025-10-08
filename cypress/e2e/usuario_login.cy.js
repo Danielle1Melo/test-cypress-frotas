@@ -37,11 +37,24 @@ describe('Usuário login e listar', () => {
    cy.wait('@loginRequest').its('response.statusCode').should('eq', 401)
   });
 
-  it.skip('Deve listar usuários com sucesso, confirmando paginação e dados comparando com a API, aplicando os filtros da consulta', () => {
+  it('Deve listar usuários com sucesso, confirmando paginação e dados comparando com a API, aplicando os filtros da consulta', () => {
+    cy.login('chefe', 'ABCDabcd1234')
+
+    let authToken = null
+    cy.request({
+      method
+    })
+
     
+    cy.intercept('GET', '**/api/usuarios**').as(listarUsuarios)
+
+    cy.getByData('botao-page-usuarios').click()
+    cy.url().should('eq', 'https://frotas.app.fslab.dev/usuarios')
+    cy.getByData('inputNomeUsuario').type('New user frota')
+    cy.getByData('botao-filtrar').click();
   });
 
-  it('Deve cadastrar um usuários com sucesso, confirmando resposta de rede retornada na operação', () => {
+  it.skip('Deve cadastrar um usuários com sucesso, confirmando resposta de rede retornada na operação', () => {
     cy.login('chefe', 'ABCDabcd1234')
     cy.getByData('botao-page-usuarios').click()
     cy.url().should('eq', 'https://frotas.app.fslab.dev/usuarios')
@@ -103,6 +116,9 @@ describe('Usuário login e listar', () => {
     cy.wait('@cadastrarUsuario').then((interception) => {
       expect(interception.response.statusCode).should('eq', 200)
     })
+  });
+
+  it.skip('Deve atualizar um usuários com sucesso, confirmando resposta de rede retornada na operação', () => {
   });
 })
 
