@@ -31,25 +31,40 @@ describe('Usuário login e listar', () => {
    cy.getByData('credencialLogin').clear().type('chefe')
    cy.getByData('senhaLogin').clear().type(' ')
    cy.getByData('button-cadastrar').click()
-   //cy.contains('Deve ter no mínimo 8 caracteres').should('be.visible')
+   cy.contains('Deve ter no mínimo 8 caracteres').should('be.visible')
 
    cy.login('boss', '12345678')
    cy.wait('@loginRequest').its('response.statusCode').should('eq', 401)
   });
 
-  it('Deve listar usuários com sucesso, confirmando paginação e dados comparando com a API, aplicando os filtros da consulta', () => {
+  it.skip('Deve listar usuários com sucesso, confirmando paginação e dados comparando com a API, aplicando os filtros da consulta', () => {
     cy.login('chefe', 'ABCDabcd1234')
-
-    let authToken = null
     cy.request({
-      method
+      method: "POST",
+      url: "https://frotas-api.app.fslab.dev/login",
+      body: { credencial: "admin", senha: "ABCDabcd1234" },
+      failOnStatusCode: false,
+    }).then((res) => {
+      expect(res.body).is.not.null
+      expect(res.status).to.eq(200)
     })
-
-    
-    cy.intercept('GET', '**/api/usuarios**').as(listarUsuarios)
+    //cy.intercept('GET', '**/api/usuarios**').as(listarUsuarios)
 
     cy.getByData('botao-page-usuarios').click()
     cy.url().should('eq', 'https://frotas.app.fslab.dev/usuarios')
+
+    let authToken = null
+    cy.request({
+      method: "GET",
+      url: 'https://frotas-api.app.fslab.dev/usuarios?page=1&limit=10', 
+      headers: {
+          'Authorizaiton': `Bearer ${authToken}`
+      }
+    }).then((res)=> {
+      expect(res.body).is.not.null
+      expect(res.status).to.eq(200)
+    })
+
     cy.getByData('inputNomeUsuario').type('New user frota')
     cy.getByData('botao-filtrar').click();
   });
@@ -119,6 +134,21 @@ describe('Usuário login e listar', () => {
   });
 
   it.skip('Deve atualizar um usuários com sucesso, confirmando resposta de rede retornada na operação', () => {
+    cy.intercept('PATCH', 'https://frotas-api.app.fslab.dev/usuarios/**').as('atualizarUsuario')
+    
+    cy.login('chefe', 'ABCDabcd1234')
+    cy.getByData('botao-page-usuarios').click()
+
+    cy.url().should('eq', 'https://frotas.app.fslab.dev/usuarios')
+    cy.getByData('link-informacoes').first().click()
+    cy.contains('h2', 'Informações do usuário').should('be.visible')
+    cy.getByData('botaoEditarUsuario').click()
+    
+    cy.getByData('nomeUsuario').clear().type('user frota')
+    cy.getByData('buttonEditar').click()
+    
+    cy.contains('Usuário atualizado com sucesso', { timeout: 10000 }).should('be.visible')
+    cy.wait('@atualizarUsuario').its('response.statusCode').should('eq', 200)
   });
 })
 
